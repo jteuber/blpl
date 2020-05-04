@@ -1,7 +1,5 @@
 #pragma once
 
-#include "Pipeline_global.h"
-
 #include <fstream>
 #include <string>
 
@@ -30,7 +28,7 @@ enum class ErrorLevel
  * @brief	A simple logger class with support for multiple logs and stream
  * style input.
  */
-class PIPELINE_EXPORT Log
+class Log
 {
 public:
     explicit Log(const std::string& strLogName);
@@ -80,4 +78,4 @@ private:
     std::ofstream m_logFile;
 };
 
-}
+} // namespace blpl

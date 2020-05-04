@@ -1,7 +1,5 @@
 #pragma once
 
-#include "Pipeline_global.h"
-
 #include <list>
 
 #include "AbstractPipeline.h"
@@ -19,7 +17,7 @@ namespace blpl {
  * consider storing the pipeline as an AbstractPipeline instead.
  */
 template <class InData, class OutData>
-class PIPELINE_EXPORT Pipeline : public AbstractPipeline
+class Pipeline : public AbstractPipeline
 {
 public:
     template <class Filter1, class Filter2>
@@ -42,7 +40,7 @@ public:
         return m_outPipe;
     }
 
-    explicit Pipeline(bool waitForSlowestFilter) 
+    explicit Pipeline(bool waitForSlowestFilter)
         : m_waitForSlowestFilter(waitForSlowestFilter)
     {}
 
@@ -113,15 +111,16 @@ Pipeline<InData, OutData>::Pipeline(
     : m_inPipe(std::move(pipeline.m_inPipe))
     , m_waitForSlowestFilter(std::move(pipeline.m_waitForSlowestFilter))
 {
-    static_assert(std::is_same<typename ExtendingFilter::outType,
-                               OutData>::value,
-                  "Filters are incompatible");
+    static_assert(
+        std::is_same<typename ExtendingFilter::outType, OutData>::value,
+        "Filters are incompatible");
 
     m_filters = std::move(pipeline.m_filters);
 
     // prepare the pipe
     auto betweenPipe = std::move(pipeline.m_outPipe);
-    m_outPipe = std::make_shared<Pipe<OutData>>(pipeline.m_waitForSlowestFilter);
+    m_outPipe =
+        std::make_shared<Pipe<OutData>>(pipeline.m_waitForSlowestFilter);
 
     // add the filter thread
     m_filters.push_back(
@@ -149,9 +148,12 @@ Pipeline<InData, OutData>::Pipeline(std::shared_ptr<Filter1> first,
                   "Filters are incompatible");
 
     // start with the pipes
-    m_inPipe         = std::make_shared<Pipe<typename Filter1::inType>>(m_waitForSlowestFilter);
-    auto betweenPipe = std::make_shared<Pipe<typename Filter1::outType>>(m_waitForSlowestFilter);
-    m_outPipe        = std::make_shared<Pipe<typename Filter2::outType>>(m_waitForSlowestFilter);
+    m_inPipe = std::make_shared<Pipe<typename Filter1::inType>>(
+        m_waitForSlowestFilter);
+    auto betweenPipe = std::make_shared<Pipe<typename Filter1::outType>>(
+        m_waitForSlowestFilter);
+    m_outPipe = std::make_shared<Pipe<typename Filter2::outType>>(
+        m_waitForSlowestFilter);
 
     // then create the filter threads
     m_filters.push_back(
@@ -174,7 +176,7 @@ Pipeline<InData, OutData>::Pipeline(std::shared_ptr<Filter1> first,
  * @return A pipeline with the two filters stringed together.
  */
 template <class Filter1, class Filter2>
-PIPELINE_EXPORT Pipeline<typename Filter1::inType, typename Filter2::outType>
+Pipeline<typename Filter1::inType, typename Filter2::outType>
 operator|(std::shared_ptr<Filter1> first, std::shared_ptr<Filter2> second)
 {
     return Pipeline<typename Filter1::inType, typename Filter2::outType>(
@@ -191,7 +193,7 @@ operator|(std::shared_ptr<Filter1> first, std::shared_ptr<Filter2> second)
  * @return A pipeline with the two filters stringed together.
  */
 template <class Filter1, class Filter2>
-PIPELINE_EXPORT Pipeline<typename Filter1::inType, typename Filter2::outType>
+Pipeline<typename Filter1::inType, typename Filter2::outType>
 operator|(Filter1&& first, Filter2&& second)
 {
     std::shared_ptr<Filter1> ptr1(new Filter1(first));
@@ -210,7 +212,7 @@ operator|(Filter1&& first, Filter2&& second)
  * @return A pipeline with the two filters stringed together.
  */
 template <class Filter1, class Filter2>
-PIPELINE_EXPORT Pipeline<typename Filter1::inType, typename Filter2::outType>
+Pipeline<typename Filter1::inType, typename Filter2::outType>
 operator|(std::shared_ptr<Filter1> first, Filter2&& second)
 {
     std::shared_ptr<Filter2> ptr(new Filter2(second));
@@ -228,7 +230,7 @@ operator|(std::shared_ptr<Filter1> first, Filter2&& second)
  * @return A pipeline with the two filters stringed together.
  */
 template <class Filter1, class Filter2>
-PIPELINE_EXPORT Pipeline<typename Filter1::inType, typename Filter2::outType>
+Pipeline<typename Filter1::inType, typename Filter2::outType>
 operator|(Filter1&& first, std::shared_ptr<Filter2> second)
 {
     std::shared_ptr<Filter1> ptr(new Filter1(first));

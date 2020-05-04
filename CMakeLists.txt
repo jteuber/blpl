@@ -8,8 +8,6 @@ project(blpl
   DESCRIPTION "big, lightweight pipeline"
   LANGUAGES CXX
 )
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # ---- Include guards ----
 

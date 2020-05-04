@@ -1,5 +1,5 @@
-#include "blpl/Pipeline.h"
 #include "blpl/MultiFilter.h"
+#include "blpl/Pipeline.h"
 
 #include <doctest/doctest.h>
 

@@ -1,7 +1,5 @@
 #pragma once
 
-#include "Pipeline_global.h"
-
 #include <atomic>
 
 namespace blpl {
@@ -22,4 +20,4 @@ protected:
     bool m_enabled;
 };
 
-}
+} // namespace blpl

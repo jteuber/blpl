@@ -19,4 +19,4 @@ protected:
     std::list<std::shared_ptr<AbstractFilterThread>> m_filters;
 };
 
-}
+} // namespace blpl

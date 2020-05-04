@@ -1,7 +1,5 @@
 #pragma once
 
-#include "Pipeline_global.h"
-
 #include <thread>
 
 #include "AbstractPipe.h"
@@ -14,7 +12,7 @@ namespace blpl {
  * @tparam TData Type of the data to pass through the Pipe.
  */
 template <typename TData>
-class PIPELINE_EXPORT Pipe : public AbstractPipe
+class Pipe : public AbstractPipe
 {
 public:
     explicit Pipe(bool waitForSlowestFilter = false);

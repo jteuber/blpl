@@ -14,8 +14,7 @@ namespace blpl {
  * filter.
  */
 template <class InData, class OutData>
-class PIPELINE_EXPORT MultiFilter
-    : public Filter<std::vector<InData>, std::vector<OutData>>
+class MultiFilter : public Filter<std::vector<InData>, std::vector<OutData>>
 {
 public:
     template <class Filter1, class Filter2>
@@ -71,8 +70,8 @@ MultiFilter<InData, OutData>::MultiFilter(
 
 template <class InData, class OutData>
 template <class ExtendingFilter>
-MultiFilter<InData, OutData>&
-MultiFilter<InData, OutData>::operator&(std::shared_ptr<ExtendingFilter> filter)
+MultiFilter<InData, OutData>& MultiFilter<InData, OutData>::operator&(
+    std::shared_ptr<ExtendingFilter> filter)
 {
     static_assert(
         std::is_base_of<Filter<InData, OutData>, ExtendingFilter>::value,
@@ -84,7 +83,7 @@ MultiFilter<InData, OutData>::operator&(std::shared_ptr<ExtendingFilter> filter)
 }
 
 template <class Filter1, class Filter2>
-PIPELINE_EXPORT MultiFilter<typename Filter1::inType, typename Filter1::outType>
+MultiFilter<typename Filter1::inType, typename Filter1::outType>
 operator&(std::shared_ptr<Filter1> first, std::shared_ptr<Filter2> second)
 {
     return MultiFilter<typename Filter1::inType, typename Filter1::outType>(

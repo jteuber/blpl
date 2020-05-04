@@ -1,7 +1,5 @@
 #pragma once
 
-#include "Pipeline_global.h"
-
 #include <memory>
 #include <mutex>
 
@@ -22,7 +20,7 @@ namespace blpl {
  * individual stages don't have to be threadsafe.
  */
 template <class InData, class OutData>
-class PIPELINE_EXPORT FilterThread : public AbstractFilterThread
+class FilterThread : public AbstractFilterThread
 {
 public:
     explicit FilterThread(std::shared_ptr<Pipe<InData>> inPipe,
