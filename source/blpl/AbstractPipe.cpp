@@ -23,7 +23,12 @@ void AbstractPipe::enable()
     m_enabled = true;
 }
 
-unsigned int AbstractPipe::size()
+void AbstractPipe::setWaitForSlowestFilter(bool newValue)
+{
+    m_waitForSlowestFilter = newValue;
+}
+
+unsigned int AbstractPipe::size() const
 {
     return m_valid ? 1 : 0;
 }

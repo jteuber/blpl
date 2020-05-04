@@ -63,7 +63,7 @@ void Pipe<TData>::push(TData&& data)
 
 /// GENERATOR PIPES
 template <>
-class PIPELINE_EXPORT Pipe<Generator> : public AbstractPipe
+class Pipe<Generator> : public AbstractPipe
 {
 public:
     explicit Pipe(bool waitForSlowestFilter = false)
@@ -81,7 +81,7 @@ public:
     }
 };
 template <>
-class PIPELINE_EXPORT Pipe<std::vector<Generator>> : public AbstractPipe
+class Pipe<std::vector<Generator>> : public AbstractPipe
 {
 public:
     explicit Pipe(bool waitForSlowestFilter = false)

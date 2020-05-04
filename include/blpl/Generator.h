@@ -36,6 +36,10 @@ public:
     {
         return m_theGenerator;
     }
+    size_t size() const
+    {
+        return std::numeric_limits<size_t>::max();
+    }
 
 private:
     blpl::Generator m_theGenerator;

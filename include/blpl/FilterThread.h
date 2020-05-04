@@ -102,6 +102,9 @@ bool FilterThread<InData, OutData>::isFiltering()
 template <class InData, class OutData>
 void FilterThread<InData, OutData>::start()
 {
+    m_inPipe->enable();
+    m_outPipe->enable();
+
     m_thread = std::thread(&FilterThread<InData, OutData>::run, this);
 }
 
@@ -117,8 +120,6 @@ void FilterThread<InData, OutData>::stop()
         m_inPipe->disable();
 
         m_thread.join();
-
-        m_inPipe->enable();
     }
 }
 

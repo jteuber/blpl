@@ -12,7 +12,9 @@ public:
     void reset();
     void disable();
     void enable();
-    unsigned int size();
+    void setWaitForSlowestFilter(bool newValue);
+
+    unsigned int size() const;
 
 protected:
     std::atomic<bool> m_valid;
