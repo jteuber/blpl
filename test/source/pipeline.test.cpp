@@ -117,15 +117,31 @@ TEST_CASE("pipeline test")
     CHECK(std::stoi(filter3->m_lastInput) == 50);
 }
 
+TEST_CASE("pipeline test with rvalue filters")
+{
+    auto pipeline =
+        TestFilter0() | TestFilter1() | TestFilter2() | TestFilter3();
+
+    REQUIRE(pipeline.length() == 4);
+
+    pipeline.start();
+    int output = 0;
+    std::string lastOut;
+    while (output++ < 100)
+        lastOut = pipeline.outPipe()->blockingPop();
+    pipeline.stop();
+
+    CHECK(std::stoi(lastOut) == 50);
+}
+
 TEST_CASE("pipeline with multifilter start")
 {
     auto filter0_0 = std::make_shared<TestFilter0>();
     auto filter0_1 = std::make_shared<TestFilter0>();
-    auto filter1  = std::make_shared<TestFilterMultiIn>();
-    auto filter2  = std::make_shared<TestFilter2>();
+    auto filter1   = std::make_shared<TestFilterMultiIn>();
+    auto filter2   = std::make_shared<TestFilter2>();
     auto filter3   = std::make_shared<TestFilter3>();
-    auto pipeline =
-        (filter0_0 & filter0_1) | filter1 | filter2 | filter3;
+    auto pipeline  = (filter0_0 & filter0_1) | filter1 | filter2 | filter3;
 
     REQUIRE(pipeline.length() == 4);
 
