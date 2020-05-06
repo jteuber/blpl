@@ -1,14 +1,12 @@
 #pragma once
 
-#include "Pipeline_global.h"
-
 #include <memory>
 
 #include "Profiler.h"
 
 namespace blpl {
 
-class PIPELINE_EXPORT AbstractFilter
+class AbstractFilter
 {
 public:
     /**
@@ -16,7 +14,7 @@ public:
      * original state, so that the next call of Filter::process behaves like
      * this object was just created.
      */
-    virtual void reset(){}
+    virtual void reset() {}
 
     virtual ~AbstractFilter() = default;
 };
@@ -27,7 +25,7 @@ public:
  * filter.
  */
 template <class InData, class OutData>
-class PIPELINE_EXPORT Filter : public AbstractFilter
+class Filter : public AbstractFilter
 {
 protected:
     /**
@@ -65,8 +63,5 @@ private:
 /// Convenience type for shared_ptr to filters
 template <class InData, class OutData>
 using FilterPtr = std::shared_ptr<Filter<InData, OutData>>;
-
-#define FilterCast(InData, OutData, ConcreteFilter)                            \
-    std::static_pointer_cast<Filter<InData, OutData>>(ConcreteFilter)
 
 } // namespace blpl

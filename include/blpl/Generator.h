@@ -1,7 +1,5 @@
 #pragma once
 
-#include "Pipeline_global.h"
-
 #include <chrono>
 #include <thread>
 #include <vector>
@@ -12,7 +10,7 @@ using HighResClock     = std::chrono::high_resolution_clock;
 using HighResDuration  = std::chrono::duration<double>;
 using HighResTimeStamp = std::chrono::time_point<HighResClock, HighResDuration>;
 
-class PIPELINE_EXPORT Generator
+class Generator
 {
 public:
     explicit Generator(HighResTimeStamp finishAt)
@@ -27,16 +25,20 @@ public:
 namespace std {
 
 template <>
-class PIPELINE_EXPORT vector<blpl::Generator>
+class vector<blpl::Generator>
 {
 public:
-    blpl::Generator& operator[](size_t) 
+    blpl::Generator& operator[](size_t)
     {
         return m_theGenerator;
     }
     const blpl::Generator& operator[](size_t) const
     {
         return m_theGenerator;
+    }
+    size_t size() const
+    {
+        return std::numeric_limits<size_t>::max();
     }
 
 private:

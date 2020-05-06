@@ -14,8 +14,7 @@ namespace blpl {
  * filter.
  */
 template <class InData, class OutData>
-class PIPELINE_EXPORT MultiFilter
-    : public Filter<std::vector<InData>, std::vector<OutData>>
+class MultiFilter : public Filter<std::vector<InData>, std::vector<OutData>>
 {
 public:
     template <class Filter1, class Filter2>
@@ -71,8 +70,8 @@ MultiFilter<InData, OutData>::MultiFilter(
 
 template <class InData, class OutData>
 template <class ExtendingFilter>
-MultiFilter<InData, OutData>&
-MultiFilter<InData, OutData>::operator&(std::shared_ptr<ExtendingFilter> filter)
+MultiFilter<InData, OutData>& MultiFilter<InData, OutData>::operator&(
+    std::shared_ptr<ExtendingFilter> filter)
 {
     static_assert(
         std::is_base_of<Filter<InData, OutData>, ExtendingFilter>::value,
@@ -84,7 +83,7 @@ MultiFilter<InData, OutData>::operator&(std::shared_ptr<ExtendingFilter> filter)
 }
 
 template <class Filter1, class Filter2>
-PIPELINE_EXPORT MultiFilter<typename Filter1::inType, typename Filter1::outType>
+MultiFilter<typename Filter1::inType, typename Filter1::outType>
 operator&(std::shared_ptr<Filter1> first, std::shared_ptr<Filter2> second)
 {
     return MultiFilter<typename Filter1::inType, typename Filter1::outType>(
@@ -102,20 +101,24 @@ std::vector<OutData>
 MultiFilter<InData, OutData>::processImpl(std::vector<InData>&& in)
 {
     assert(!m_filters.empty());
-
-    // call process of all sub-filters in their own thread
-    std::vector<std::thread> threads;
     std::vector<OutData> out(m_filters.size());
-    for (size_t i = 1; i < m_filters.size(); ++i)
-        threads.emplace_back([&, index = i, in = std::move(in[i])]() mutable {
-            out[index] = m_filters[index]->process(std::move(in));
-        });
 
-    // but execute the first filter in this thread
-    out[0] = m_filters[0]->process(std::move(in[0]));
+    if (in.size() >= m_filters.size()) {
+        // call process of all sub-filters in their own thread
+        std::vector<std::thread> threads;
+        for (size_t i = 1; i < m_filters.size(); ++i)
+            threads.emplace_back([& out   = out[i],
+                                  &filter = m_filters[i],
+                                  in      = std::move(in[i])]() mutable {
+                out = filter->process(std::move(in));
+            });
 
-    for (auto& thread : threads)
-        thread.join();
+        // but execute the first filter in this thread
+        out[0] = m_filters[0]->process(std::move(in[0]));
+
+        for (auto& thread : threads)
+            thread.join();
+    }
 
     return out;
 }

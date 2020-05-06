@@ -1,7 +1,5 @@
 #pragma once
 
-#include "Pipeline_global.h"
-
 #include <thread>
 
 #include "AbstractPipe.h"
@@ -14,7 +12,7 @@ namespace blpl {
  * @tparam TData Type of the data to pass through the Pipe.
  */
 template <typename TData>
-class PIPELINE_EXPORT Pipe : public AbstractPipe
+class Pipe : public AbstractPipe
 {
 public:
     explicit Pipe(bool waitForSlowestFilter = false);
@@ -65,7 +63,7 @@ void Pipe<TData>::push(TData&& data)
 
 /// GENERATOR PIPES
 template <>
-class PIPELINE_EXPORT Pipe<Generator> : public AbstractPipe
+class Pipe<Generator> : public AbstractPipe
 {
 public:
     explicit Pipe(bool waitForSlowestFilter = false)
@@ -83,7 +81,7 @@ public:
     }
 };
 template <>
-class PIPELINE_EXPORT Pipe<std::vector<Generator>> : public AbstractPipe
+class Pipe<std::vector<Generator>> : public AbstractPipe
 {
 public:
     explicit Pipe(bool waitForSlowestFilter = false)

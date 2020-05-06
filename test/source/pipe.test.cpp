@@ -46,7 +46,7 @@ TEST_CASE("pop")
     REQUIRE(data == 1);
 }
 
-TEST_CASE("push push pop default")
+TEST_CASE("push push pop discarding")
 {
     Pipe<int> pipe(false);
     pipe.push(1);
@@ -54,6 +54,25 @@ TEST_CASE("push push pop default")
     pipe.push(2);
     REQUIRE(pipe.size() == 1);
     REQUIRE(pipe.pop() == 2);
+}
+
+TEST_CASE("push push pop waiting")
+{
+    Pipe<int> pipe(true);
+    pipe.push(1);
+    REQUIRE(pipe.size() == 1);
+
+    std::thread thread([&pipe]() { pipe.push(2); });
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(20));
+    REQUIRE(pipe.size() == 1);
+    REQUIRE(pipe.pop() == 1);
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(20));
+    REQUIRE(pipe.size() == 1);
+    REQUIRE(pipe.pop() == 2);
+
+    thread.join();
 }
 
 TEST_CASE("reset")
@@ -90,7 +109,7 @@ TEST_CASE("blocking push")
     Pipe<int> pipe(true);
     pipe.push(1);
 
-    std::atomic<bool> threadActive(false);
+    std::atomic<bool> threadActive(true);
     std::thread thread([&pipe, &threadActive]() {
         threadActive = true;
         pipe.push(2);

@@ -1,7 +1,5 @@
 #pragma once
 
-#include "Pipeline_global.h"
-
 #include <atomic>
 
 namespace blpl {
@@ -14,7 +12,9 @@ public:
     void reset();
     void disable();
     void enable();
-    unsigned int size();
+    void setWaitForSlowestFilter(bool newValue);
+
+    unsigned int size() const;
 
 protected:
     std::atomic<bool> m_valid;
@@ -22,4 +22,4 @@ protected:
     bool m_enabled;
 };
 
-}
+} // namespace blpl

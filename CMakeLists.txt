@@ -4,12 +4,10 @@ cmake_minimum_required(VERSION 3.14 FATAL_ERROR)
 
 # Note: update this to your new project's name and version
 project(blpl
-  VERSION 0.1.1
+  VERSION 0.1.2
   DESCRIPTION "big, lightweight pipeline"
   LANGUAGES CXX
 )
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # ---- Include guards ----
 
