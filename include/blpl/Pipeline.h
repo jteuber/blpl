@@ -54,6 +54,11 @@ public:
         return m_outPipe;
     }
 
+    std::shared_ptr<Pipe<InData>> inPipe()
+    {
+        return m_inPipe;
+    }
+
 private:
     explicit Pipeline() = default;
 

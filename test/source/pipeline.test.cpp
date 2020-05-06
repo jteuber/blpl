@@ -97,7 +97,7 @@ TEST_CASE("construction with rvalues")
     REQUIRE(pipeline.length() == 3);
 }
 
-TEST_CASE("pipeline test")
+TEST_CASE("pipeline test with generator")
 {
     auto filter0  = std::make_shared<TestFilter0>();
     auto filter1  = std::make_shared<TestFilter1>();
@@ -114,24 +114,46 @@ TEST_CASE("pipeline test")
     pipeline.stop();
 
     CHECK(filter0->m_i == 100);
+    REQUIRE(!filter3->m_lastInput.empty());
     CHECK(std::stoi(filter3->m_lastInput) == 50);
 }
 
-TEST_CASE("pipeline test with rvalue filters")
+TEST_CASE("pipeline with rvalue filters")
 {
-    auto pipeline =
-        TestFilter0() | TestFilter1() | TestFilter2() | TestFilter3();
+    auto pipeline = TestFilter1() | TestFilter2() | TestFilter3();
 
-    REQUIRE(pipeline.length() == 4);
+    REQUIRE(pipeline.length() == 3);
 
     pipeline.start();
     int output = 0;
     std::string lastOut;
-    while (output++ < 100)
+    while (output++ < 100) {
+        int pipeData = output;
+        pipeline.inPipe()->push(std::move(pipeData));
         lastOut = pipeline.outPipe()->blockingPop();
+    }
     pipeline.stop();
 
+    REQUIRE(!lastOut.empty());
     CHECK(std::stoi(lastOut) == 50);
+}
+
+TEST_CASE("pipeline with discarding filters")
+{
+    auto filter0  = std::make_shared<TestFilter0>();
+    auto pipeline = filter0 > TestFilter1() > TestFilter2() > TestFilter3();
+
+    REQUIRE(pipeline.length() == 4);
+
+    pipeline.start();
+    while (filter0->m_i != 100)
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+
+    std::string lastOut = pipeline.outPipe()->blockingPop();
+    pipeline.stop();
+
+    REQUIRE(!lastOut.empty());
+    REQUIRE(std::stoi(lastOut) == 50);
 }
 
 TEST_CASE("pipeline with multifilter start")
