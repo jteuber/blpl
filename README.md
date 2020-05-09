@@ -1,3 +1,10 @@
+[![Actions Status](https://github.com/jteuber/blpl/workflows/MacOS/badge.svg)](https://github.com/jteuber/blpl/actions)
+[![Actions Status](https://github.com/jteuber/blpl/workflows/Windows/badge.svg)](https://github.com/jteuber/blpl/actions)
+[![Actions Status](https://github.com/jteuber/blpl/workflows/Ubuntu/badge.svg)](https://github.com/jteuber/blpl/actions)
+[![Actions Status](https://github.com/jteuber/blpl/workflows/Style/badge.svg)](https://github.com/jteuber/blpl/actions)
+[![Actions Status](https://github.com/jteuber/blpl/workflows/Install/badge.svg)](https://github.com/jteuber/blpl/actions)
+[![codecov](https://codecov.io/gh/jteuber/blpl/branch/master/graph/badge.svg)](https://codecov.io/gh/jteuber/blpl)
+
 # blpl
 
 Welcome to the big, lightweight pipeline: a modern C++ pipeline library for high concurrency, high through-put 
