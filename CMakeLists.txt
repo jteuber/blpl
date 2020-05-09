@@ -4,7 +4,7 @@ cmake_minimum_required(VERSION 3.14 FATAL_ERROR)
 
 # Note: update this to your new project's name and version
 project(blpl
-  VERSION 0.1.2
+  VERSION 0.1.3
   DESCRIPTION "big, lightweight pipeline"
   LANGUAGES CXX
 )
@@ -49,7 +49,10 @@ target_compile_options(blpl PUBLIC "$<$<BOOL:${MSVC}>:/permissive->")
 
 # Link dependencies (if required)
 # target_link_libraries(blpl PUBLIC cxxopts)
-target_link_libraries(blpl PUBLIC pthread)
+
+# add threading library
+find_package(Threads)
+target_link_libraries(blpl PUBLIC ${CMAKE_THREAD_LIBS_INIT})
 
 target_include_directories(blpl
   PUBLIC
