@@ -21,10 +21,12 @@ public:
     void reset() override
     {
         Filter<Generator, int>::reset();
-        m_i = 0;
+        m_i              = 0;
+        m_resetWasCalled = true;
     }
 
-    int m_i = 0;
+    int m_i               = 0;
+    bool m_resetWasCalled = false;
 };
 
 class TestFilter1 : public Filter<int, float>
@@ -232,7 +234,7 @@ TEST_CASE("pipeline reset while running")
 
     pipeline.reset();
 
-    REQUIRE(filter0->m_i == 0);
+    REQUIRE(filter0->m_resetWasCalled);
 
     for (int i = 0; i < 101; ++i) {
         pipeline.outPipe()->blockingPop();
