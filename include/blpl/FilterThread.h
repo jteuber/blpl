@@ -33,6 +33,7 @@ public:
 
     void start() override;
     void stop() override;
+    void reset() override;
 
 private:
     void run();
@@ -115,6 +116,23 @@ void FilterThread<InData, OutData>::stop()
         m_inPipe->disable();
 
         m_thread.join();
+    }
+}
+
+/**
+ * @brief Stops this filter-thread, resets the filter and starts the thread back
+ * up.
+ */
+template <class InData, class OutData>
+void FilterThread<InData, OutData>::reset()
+{
+    bool stopAndRestart = m_bFiltering;
+    if (stopAndRestart) {
+        stop();
+    }
+    m_filter->reset();
+    if (stopAndRestart) {
+        start();
     }
 }
 
