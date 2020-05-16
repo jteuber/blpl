@@ -12,6 +12,7 @@ class AbstractPipeline
 public:
     void start();
     void stop();
+    void reset();
 
     [[nodiscard]] size_t length() const;
 
@@ -35,6 +36,13 @@ void AbstractPipeline::stop()
 {
     for (auto& filter : m_filters) {
         filter->stop();
+    }
+}
+
+void AbstractPipeline::reset()
+{
+    for (auto& filter : m_filters) {
+        filter->reset();
     }
 }
 
