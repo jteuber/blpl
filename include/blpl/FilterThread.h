@@ -126,9 +126,14 @@ void FilterThread<InData, OutData>::stop()
 template <class InData, class OutData>
 void FilterThread<InData, OutData>::reset()
 {
-    stop();
+    bool stopAndRestart = m_bFiltering;
+    if (stopAndRestart) {
+        stop();
+    }
     m_filter->reset();
-    start();
+    if (stopAndRestart) {
+        start();
+    }
 }
 
 /**
