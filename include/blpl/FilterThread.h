@@ -25,8 +25,7 @@ class FilterThread : public AbstractFilterThread
 public:
     explicit FilterThread(std::shared_ptr<Pipe<InData>> inPipe,
                           std::shared_ptr<Filter<InData, OutData>> filter,
-                          std::shared_ptr<Pipe<OutData>> outPipe,
-                          bool bSelfManaged = true);
+                          std::shared_ptr<Pipe<OutData>> outPipe);
 
     ~FilterThread();
 
@@ -34,6 +33,7 @@ public:
 
     void start() override;
     void stop() override;
+    void reset() override;
 
 private:
     void run();
@@ -45,7 +45,6 @@ private:
 
     volatile bool m_bFilterThreadActive;
     volatile bool m_bFiltering;
-    bool m_bSelfManaged;
     std::thread m_thread;
 };
 
@@ -56,7 +55,6 @@ private:
  * @param filter       The filter that is called for processing in this thread
  * in a shared pointer.
  * @param outPipe       Pipe on which the filter will dump its outgoing data.
- * @param bSelfManaged  True if the FilterThread is allowed to manage the filter
  * by itself, false if another class manages the FilterThread (i.e. calls
  * FilterThread::run()).
  */
@@ -64,14 +62,12 @@ template <class InData, class OutData>
 FilterThread<InData, OutData>::FilterThread(
     std::shared_ptr<Pipe<InData>> inPipe,
     std::shared_ptr<Filter<InData, OutData>> filter,
-    std::shared_ptr<Pipe<OutData>> outPipe,
-    bool bSelfManaged)
+    std::shared_ptr<Pipe<OutData>> outPipe)
     : m_inPipe(inPipe)
     , m_filter(filter)
     , m_outPipe(outPipe)
     , m_bFilterThreadActive(false)
     , m_bFiltering(false)
-    , m_bSelfManaged(bSelfManaged)
 {}
 
 /**
@@ -124,6 +120,23 @@ void FilterThread<InData, OutData>::stop()
 }
 
 /**
+ * @brief Stops this filter-thread, resets the filter and starts the thread back
+ * up.
+ */
+template <class InData, class OutData>
+void FilterThread<InData, OutData>::reset()
+{
+    bool stopAndRestart = m_bFiltering;
+    if (stopAndRestart) {
+        stop();
+    }
+    m_filter->reset();
+    if (stopAndRestart) {
+        start();
+    }
+}
+
+/**
  * @brief Method that is called by the thread, waits for input data and calls
  * the filters process method.
  */
@@ -136,7 +149,7 @@ void FilterThread<InData, OutData>::run()
         InData temp = m_inPipe->blockingPop();
         if (m_bFilterThreadActive)
             m_outPipe->push(m_filter->process(std::move(temp)));
-    } while (m_bFilterThreadActive && m_bSelfManaged);
+    } while (m_bFilterThreadActive);
     m_bFiltering = false;
 }
 

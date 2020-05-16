@@ -20,10 +20,13 @@ public:
 
     void reset() override
     {
-        m_i = 0;
+        Filter<Generator, int>::reset();
+        m_i              = 0;
+        m_resetWasCalled = true;
     }
 
-    int m_i = 0;
+    int m_i               = 0;
+    bool m_resetWasCalled = false;
 };
 
 class TestFilter1 : public Filter<int, float>
@@ -210,6 +213,63 @@ TEST_CASE("pipeline with multifilter start to end")
     CHECK(std::stoi(lastOut[0]) == 50);
     REQUIRE(!lastOut[1].empty());
     CHECK(std::stoi(lastOut[1]) == 50);
+}
+
+TEST_CASE("pipeline reset while running")
+{
+    auto filter0  = std::make_shared<TestFilter0>();
+    auto filter1  = std::make_shared<TestFilter1>();
+    auto filter2  = std::make_shared<TestFilter2>();
+    auto filter3  = std::make_shared<TestFilter3>();
+    auto pipeline = filter0 | filter1 | filter2 | filter3;
+
+    REQUIRE(pipeline.length() == 4);
+
+    pipeline.start();
+    for (int i = 0; i < 101; ++i) {
+        pipeline.outPipe()->blockingPop();
+    }
+
+    REQUIRE(filter0->m_i > 0);
+
+    pipeline.reset();
+
+    REQUIRE(filter0->m_resetWasCalled);
+
+    for (int i = 0; i < 101; ++i) {
+        pipeline.outPipe()->blockingPop();
+    }
+
+    REQUIRE(filter0->m_i > 0);
+
+    pipeline.stop();
+}
+
+TEST_CASE("pipeline reset after stop")
+{
+    auto filter0  = std::make_shared<TestFilter0>();
+    auto pipeline = filter0 > TestFilter1() > TestFilter2() > TestFilter3();
+
+    REQUIRE(pipeline.length() == 4);
+
+    pipeline.start();
+    for (int i = 0; i < 101; ++i) {
+        pipeline.outPipe()->blockingPop();
+    }
+    std::this_thread::yield();
+    pipeline.stop();
+
+    REQUIRE(filter0->m_i > 0);
+
+    pipeline.reset();
+
+    REQUIRE(filter0->m_i == 0);
+
+    // wait for a bit to make sure that no filterthread was actually started up
+    // again
+    std::this_thread::sleep_for(std::chrono::milliseconds(10));
+
+    REQUIRE(filter0->m_i == 0);
 }
 
 } // namespace

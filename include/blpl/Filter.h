@@ -2,8 +2,6 @@
 
 #include <memory>
 
-#include "Profiler.h"
-
 namespace blpl {
 
 class AbstractFilter
@@ -13,10 +11,31 @@ public:
      * @brief When implemented, this method should reset the filter to it's
      * original state, so that the next call of Filter::process behaves like
      * this object was just created.
+     *
+     * @note Any implementer needs to call this as well.
      */
-    virtual void reset() {}
+    virtual void reset()
+    {
+        resetCounter();
+    }
 
     virtual ~AbstractFilter() = default;
+
+    /**
+     * @brief Returns the number of runs of the filter since the start of the
+     * pipeline or last reset.
+     */
+    uint32_t counter()
+    {
+        return m_counter;
+    }
+    void resetCounter()
+    {
+        m_counter = 0;
+    }
+
+protected:
+    uint32_t m_counter = 0;
 };
 
 /**
@@ -32,32 +51,25 @@ protected:
      * @brief When implementing this interface, this is the part that's used in
      * the pipeline.
      *
-     * @param in Shared pointer to some kind of input data of the type
-     * PipeData.
+     * @param in Input data for this filter of type InData.
      *
-     * @return Shared pointer to the output of the type PipeData.
+     * @return Output of this filter of type OutData.
      */
     virtual OutData processImpl(InData&& in) = 0;
 
 public:
-    Filter()
-        : m_prof(typeid(*this).name())
-    {}
+    Filter() {}
 
     virtual OutData process(InData&& in)
     {
-        m_prof.startCycle();
         auto out = processImpl(std::move(in));
-        m_prof.endCycle();
+        ++m_counter;
 
         return out;
     }
 
     typedef InData inType;
     typedef OutData outType;
-
-private:
-    Profiler m_prof;
 };
 
 /// Convenience type for shared_ptr to filters

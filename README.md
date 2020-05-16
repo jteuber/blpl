@@ -10,11 +10,13 @@
 Welcome to the big, lightweight pipeline: a modern C++ pipeline library for high concurrency, high through-put 
 computation on the CPU.
 
+WARNING: The API of this library is still very unstable in the 0.1.x times. I might change a lot from one subversion to the next. Only what's used in *How to compile* is guarranteed to work in this minor version. (But it might change slightly in 0.2.)
+
 The concurrency is happening on a per filter-instance level. This means that one specific filter in the pipeline is
  always running sequentially, making it possible for the filter to have state, while all filters run parallel to each
   other, enabling very high concurrency on pipelines with a medium to high number of filters.
 
-This library was originally developed for a research project using computer-vision and machine-learning. The goal was
+This library was originally developed for a research project using computer vision and machine learning. The goal was
  to have a lightweight pipeline library that adds as little overhead as possible. 
 
 ## How to compile
@@ -30,6 +32,8 @@ The library has for now only been tested on linux. It might still have some hick
 ## How to use
 
 ```c++
+#include <blpl/Pipeline.h>
+
 // write a filter by inheriting Filter<InData,OutData>. *Generator* is a special type that tells the pipeline to
 // continuously call this filter.
 class StartFilter : public blpl::Filter<Generator, int>
@@ -89,12 +93,35 @@ int main()
 }
 ```
 
-## Poor Mans Profiler
 
-This library also contains a profiler and a very simple logger that supports logging into several files at ones. The
-profiler is usually compiled out. To use it you have to compile this library with `PROFILE` defined. Then the profiler
-will write one file for every filter in the pipeline with the processing time per run taken. The name of the file will
-be the symbol name of the class that defines the filter.
+## Changelog
+
+### v0.1.4
+
+* Made library header-only
+* Removed log and profiler classes
+* Added reset method to pipeline that resets all filters and restarts their threads if running
+
+### v0.1.3
+
+* Fix compiling on windows with threading library
+
+### v0.1.2
+
+* Remove defines for dll-linkage, now static lib only
+* Add new pipe operator ">" that creates discarding pipes
+* Make existing pipe operator "|" create waiting pipes
+* Make it possible to construct filters directly into the pipeline
+
+### v0.1.1
+
+* Add MultiFilter, a class that encapsulates several filters into one, making them run in lock-step
+* Use namespace "blpl" everywhere
+
+### v0.1.0
+
+* initial version with single-flow pipeline as shared object/dll
+
 
 ## License
 
