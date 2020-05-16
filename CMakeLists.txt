@@ -32,30 +32,29 @@ CPMAddPackage(
 # Note: globbing sources is considered bad practice as CMake's generators may not detect new files automatically.
 # Keep that in mind when changing files, or explicitly mention them here.
 FILE(GLOB_RECURSE headers CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/include/*.h")
-FILE(GLOB_RECURSE sources CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/source/*.cpp")
+#FILE(GLOB_RECURSE sources CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/source/*.cpp")
 
 # ---- Create library ----
 
 # Note: for header-only libraries change all PUBLIC flags to INTERFACE and create an interface target:
-# add_library(blpl INTERFACE)
-# set_target_properties(blpl PROPERTIES INTERFACE_COMPILE_FEATURES cxx_std_17)
+add_library(blpl INTERFACE)
+set_target_properties(blpl PROPERTIES INTERFACE_COMPILE_FEATURES cxx_std_17)
 
-add_library(blpl ${headers} ${sources})
-
-set_target_properties(blpl PROPERTIES CXX_STANDARD 17)
+#add_library(blpl ${headers} ${sources})
+#set_target_properties(blpl PROPERTIES CXX_STANDARD 17)
 
 # beeing a cross-platform target, we enforce standards conformance on MSVC
-target_compile_options(blpl PUBLIC "$<$<BOOL:${MSVC}>:/permissive->")
+target_compile_options(blpl INTERFACE "$<$<BOOL:${MSVC}>:/permissive->")
 
 # Link dependencies (if required)
 # target_link_libraries(blpl PUBLIC cxxopts)
 
 # add threading library
 find_package(Threads)
-target_link_libraries(blpl PUBLIC ${CMAKE_THREAD_LIBS_INIT})
+target_link_libraries(blpl INTERFACE ${CMAKE_THREAD_LIBS_INIT})
 
 target_include_directories(blpl
-  PUBLIC
+  INTERFACE
     $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
     $<INSTALL_INTERFACE:include/${PROJECT_NAME}-${PROJECT_VERSION}>
 )
