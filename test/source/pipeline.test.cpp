@@ -1,6 +1,8 @@
 #include "blpl/MultiFilter.h"
 #include "blpl/Pipeline.h"
 
+#include <string> // std::to_string, std::stoi
+
 #include <doctest/doctest.h>
 
 using namespace blpl;
