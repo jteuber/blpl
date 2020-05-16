@@ -22,7 +22,8 @@ public:
                 std::shared_ptr<Filter2> second);
 
     template <class FilterClass>
-    MultiFilter(std::vector<std::shared_ptr<FilterClass>> filterVector);
+    MultiFilter(
+        std::vector<std::shared_ptr<FilterClass>> filterVector) explicit;
 
     template <class ExtendingFilter>
     MultiFilter<InData, OutData>&
@@ -70,8 +71,8 @@ MultiFilter<InData, OutData>::MultiFilter(
 
 template <class InData, class OutData>
 template <class ExtendingFilter>
-MultiFilter<InData, OutData>& MultiFilter<InData, OutData>::operator&(
-    std::shared_ptr<ExtendingFilter> filter)
+MultiFilter<InData, OutData>&
+MultiFilter<InData, OutData>::operator&(std::shared_ptr<ExtendingFilter> filter)
 {
     static_assert(
         std::is_base_of<Filter<InData, OutData>, ExtendingFilter>::value,
@@ -107,7 +108,7 @@ MultiFilter<InData, OutData>::processImpl(std::vector<InData>&& in)
         // call process of all sub-filters in their own thread
         std::vector<std::thread> threads;
         for (size_t i = 1; i < m_filters.size(); ++i)
-            threads.emplace_back([& out   = out[i],
+            threads.emplace_back([&out    = out[i],
                                   &filter = m_filters[i],
                                   in      = std::move(in[i])]() mutable {
                 out = filter->process(std::move(in));
