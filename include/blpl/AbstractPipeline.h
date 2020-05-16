@@ -10,40 +10,34 @@ namespace blpl {
 class AbstractPipeline
 {
 public:
-    void start();
-    void stop();
-    void reset();
+    void start()
+    {
+        for (auto& filter : m_filters) {
+            filter->start();
+        }
+    }
 
-    [[nodiscard]] size_t length() const;
+    void stop()
+    {
+        for (auto& filter : m_filters) {
+            filter->stop();
+        }
+    }
+
+    void reset()
+    {
+        for (auto& filter : m_filters) {
+            filter->reset();
+        }
+    }
+
+    [[nodiscard]] size_t length() const
+    {
+        return m_filters.size();
+    }
 
 protected:
     std::list<std::shared_ptr<AbstractFilterThread>> m_filters;
 };
-
-size_t AbstractPipeline::length() const
-{
-    return m_filters.size();
-}
-
-void AbstractPipeline::start()
-{
-    for (auto& filter : m_filters) {
-        filter->start();
-    }
-}
-
-void AbstractPipeline::stop()
-{
-    for (auto& filter : m_filters) {
-        filter->stop();
-    }
-}
-
-void AbstractPipeline::reset()
-{
-    for (auto& filter : m_filters) {
-        filter->reset();
-    }
-}
 
 } // namespace blpl

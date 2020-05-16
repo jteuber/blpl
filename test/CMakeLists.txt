@@ -51,16 +51,16 @@ set_target_properties(blplTests PROPERTIES CXX_STANDARD 17)
 # enable compiler warnings
 if (NOT TEST_INSTALLED_VERSION)
   if (CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "GNU")
-    target_compile_options(blpl PUBLIC -Wall -pedantic -Wextra -Werror)
+    target_compile_options(blpl INTERFACE -Wall -pedantic -Wextra -Werror)
   elseif(MSVC)
-    target_compile_options(blpl PUBLIC /W4 /WX)
+    target_compile_options(blpl INTERFACE /W4 /WX)
     target_compile_definitions(blplTests PUBLIC DOCTEST_CONFIG_USE_STD_HEADERS)
   endif()
 endif()
 
 # ---- Add blplTests ----
 
-ENABLE_TESTING() 
+ENABLE_TESTING()
 
 # Note: doctest and similar testing frameworks can automatically configure CMake tests
 # For other testing frameworks add the tests target instead:
@@ -72,6 +72,6 @@ doctest_discover_tests(blplTests)
 # ---- code coverage ----
 
 if (ENABLE_TEST_COVERAGE)
-  target_compile_options(blpl PUBLIC -O0 -g -fprofile-arcs -ftest-coverage)
-  target_link_options(blpl PUBLIC -fprofile-arcs -ftest-coverage)
+  target_compile_options(blpl INTERFACE -O0 -g -fprofile-arcs -ftest-coverage)
+  target_link_options(blpl INTERFACE -fprofile-arcs -ftest-coverage)
 endif()

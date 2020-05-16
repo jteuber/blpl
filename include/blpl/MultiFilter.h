@@ -22,8 +22,8 @@ public:
                 std::shared_ptr<Filter2> second);
 
     template <class FilterClass>
-    MultiFilter(
-        std::vector<std::shared_ptr<FilterClass>> filterVector) explicit;
+    explicit MultiFilter(
+        std::vector<std::shared_ptr<FilterClass>> filterVector);
 
     template <class ExtendingFilter>
     MultiFilter<InData, OutData>&

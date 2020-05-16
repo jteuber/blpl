@@ -2,8 +2,6 @@
 
 #include <memory>
 
-#include "Profiler.h"
-
 namespace blpl {
 
 class AbstractFilter
@@ -31,7 +29,7 @@ public:
     {
         return m_counter;
     }
-    uint32_t resetCounter()
+    void resetCounter()
     {
         m_counter = 0;
     }

@@ -4,7 +4,6 @@
 
 #include "AbstractPipeline.h"
 #include "FilterThread.h"
-#include "Pipe.h"
 
 namespace blpl {
 
