@@ -13,10 +13,31 @@ public:
      * @brief When implemented, this method should reset the filter to it's
      * original state, so that the next call of Filter::process behaves like
      * this object was just created.
+     *
+     * @note Any implementer needs to call this as well.
      */
-    virtual void reset() {}
+    virtual void reset()
+    {
+        resetCounter();
+    }
 
     virtual ~AbstractFilter() = default;
+
+    /**
+     * @brief Returns the number of runs of the filter since the start of the
+     * pipeline or last reset.
+     */
+    uint32_t counter()
+    {
+        return m_counter;
+    }
+    uint32_t resetCounter()
+    {
+        m_counter = 0;
+    }
+
+protected:
+    uint32_t m_counter = 0;
 };
 
 /**
@@ -44,6 +65,7 @@ public:
     virtual OutData process(InData&& in)
     {
         auto out = processImpl(std::move(in));
+        ++m_counter;
 
         return out;
     }
