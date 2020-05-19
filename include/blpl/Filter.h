@@ -2,41 +2,9 @@
 
 #include <memory>
 
+#include "AbstractFilter.h"
+
 namespace blpl {
-
-class AbstractFilter
-{
-public:
-    /**
-     * @brief When implemented, this method should reset the filter to it's
-     * original state, so that the next call of Filter::process behaves like
-     * this object was just created.
-     *
-     * @note Any implementer needs to call this as well.
-     */
-    virtual void reset()
-    {
-        resetCounter();
-    }
-
-    virtual ~AbstractFilter() = default;
-
-    /**
-     * @brief Returns the number of runs of the filter since the start of the
-     * pipeline or last reset.
-     */
-    uint32_t counter()
-    {
-        return m_counter;
-    }
-    void resetCounter()
-    {
-        m_counter = 0;
-    }
-
-protected:
-    uint32_t m_counter = 0;
-};
 
 /**
  * @brief This is the interface for all filters of the pipeline. It takes an
@@ -62,7 +30,12 @@ public:
 
     virtual OutData process(InData&& in)
     {
+        std::chrono::time_point start =
+            std::chrono::high_resolution_clock::now();
+
         auto out = processImpl(std::move(in));
+
+        m_wallTime += std::chrono::high_resolution_clock::now() - start;
         ++m_counter;
 
         return out;
