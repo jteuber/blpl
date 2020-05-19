@@ -30,7 +30,12 @@ public:
 
     virtual OutData process(InData&& in)
     {
+        std::chrono::time_point start =
+            std::chrono::high_resolution_clock::now();
+
         auto out = processImpl(std::move(in));
+
+        m_wallTime += std::chrono::high_resolution_clock::now() - start;
         ++m_counter;
 
         return out;
