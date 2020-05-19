@@ -59,3 +59,28 @@ TEST_CASE("stop")
     std::this_thread::sleep_for(std::chrono::milliseconds(50));
     REQUIRE(outPipe->size() == 0);
 }
+
+TEST_CASE("metrics")
+{
+    auto inPipe  = std::make_shared<Pipe<int>>();
+    auto outPipe = std::make_shared<Pipe<int>>();
+    auto filter  = std::make_shared<Passthrough>();
+    FilterThread<int, int> ft(inPipe, filter, outPipe);
+
+    ft.start();
+    inPipe->push(1);
+    REQUIRE(outPipe->blockingPop() == 1);
+    REQUIRE(ft.isFiltering());
+    REQUIRE(filter->counter() == 1);
+
+    inPipe->push(2);
+    REQUIRE(outPipe->blockingPop() == 2);
+    REQUIRE(filter->counter() == 2);
+
+    filter->resetMetrics();
+    REQUIRE(filter->counter() == 0);
+
+    inPipe->push(3);
+    REQUIRE(outPipe->blockingPop() == 3);
+    REQUIRE(filter->counter() == 1);
+}
