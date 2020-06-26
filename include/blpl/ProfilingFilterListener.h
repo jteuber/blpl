@@ -4,6 +4,9 @@
 
 namespace blpl {
 
+/**
+ * @brief FilterListener for collecting profiling information.
+ */
 class ProfilingFilterListener : public AbstractFilterListener
 {
 public:

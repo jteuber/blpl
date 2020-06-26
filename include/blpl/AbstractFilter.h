@@ -7,6 +7,10 @@
 
 namespace blpl {
 
+/**
+ * @brief Provides a way to inject introspecting code into a Filter without
+ * changing the actual filter.
+ */
 class AbstractFilterListener
 {
 public:
@@ -14,6 +18,10 @@ public:
     virtual void postProcessCallback(const std::any& out) = 0;
 };
 
+/**
+ * @brief Abstract superclass for the filter with methods that are not dependend
+ * on the template parameters.
+ */
 class AbstractFilter
 {
 public:
