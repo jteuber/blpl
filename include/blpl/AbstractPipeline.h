@@ -38,26 +38,14 @@ public:
         }
     }
 
-    void resetFilterMetrics()
-    {
-        for (auto& filter : m_filters) {
-            filter->resetMetrics();
-        }
-    }
-
-    std::list<FilterMetrics> getMetricsAndReset()
-    {
-        std::list<FilterMetrics> ret;
-        for (auto& filter : m_filters) {
-            ret.push_back({filter->counter(), filter->wallTime()});
-            filter->resetMetrics();
-        }
-        return ret;
-    }
-
     [[nodiscard]] size_t length() const
     {
         return m_filters.size();
+    }
+
+    const std::list<std::shared_ptr<AbstractFilter>> filters() const
+    {
+        return m_filters;
     }
 
 protected:
