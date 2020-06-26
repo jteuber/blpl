@@ -11,6 +11,7 @@ class ProfilingFilterListener : public AbstractFilterListener
 {
 public:
     ProfilingFilterListener() {}
+    virtual ~ProfilingFilterListener() = default;
 
     /**
      * @brief Returns the number of runs of the filter since the start of the
