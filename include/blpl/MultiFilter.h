@@ -31,6 +31,12 @@ public:
 
     [[nodiscard]] size_t size() const;
 
+    void reset() override
+    {
+        for (auto& filter : m_filters)
+            filter->reset();
+    }
+
 protected:
     std::vector<OutData> processImpl(std::vector<InData>&& in) override;
 

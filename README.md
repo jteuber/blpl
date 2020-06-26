@@ -7,17 +7,17 @@
 
 # blpl
 
-Welcome to the big, lightweight pipeline: a modern C++ pipeline library for high concurrency, high through-put 
+Welcome to the big, lightweight pipeline: a modern C++ pipeline library for high concurrency, high through-put
 computation on the CPU.
 
-WARNING: The API of this library is still very unstable in the 0.1.x times. I might change a lot from one subversion to the next. Only what's used in *How to compile* is guarranteed to work in this minor version. (But it might change slightly in 0.2.)
+WARNING: The API of this library is still very unstable in the 0.1.x times. I might change a lot from one subversion to the next. Only what's used in *How to compile* is guaranteed to work in this minor version. (But it might change slightly in 0.2.)
 
 The concurrency is happening on a per filter-instance level. This means that one specific filter in the pipeline is
  always running sequentially, making it possible for the filter to have state, while all filters run parallel to each
   other, enabling very high concurrency on pipelines with a medium to high number of filters.
 
 This library was originally developed for a research project using computer vision and machine learning. The goal was
- to have a lightweight pipeline library that adds as little overhead as possible. 
+ to have a lightweight pipeline library that adds as little overhead as possible.
 
 ## How to compile
 
@@ -28,7 +28,7 @@ mkdir build && cd build && cmake .. && make && sudo make install
 in the library directory.
 
 The library has for now only been tested on linux. It might still have some hickups on windows and mac, but should in theory (tm) work fine.
- 
+
 ## How to use
 
 ```c++
@@ -66,20 +66,20 @@ public:
     }
 };
 
-int main() 
+int main()
 {
     // instantiate the filters
     auto startFilter = std::make_shared<StartFilter>();
     auto filter1 = std::make_shared<TestFilter1>();
     ...
     auto endFilter = std::make_shared<EndFilter>();
-    
+
     // build the pipeline
     auto pipeline = startFilter |
                     filter1 |
                     ... |
                     endFilter;
-    
+
     // start the pipeline
     pipeline.start();
 
@@ -95,6 +95,14 @@ int main()
 
 
 ## Changelog
+
+### v0.1.5
+
+* Fix test on Windows
+* Fix a bug in the pipe that could lead to crashes
+* Add functionality to add a listener to filters
+  * Provide a profiling and an intercepting filter listener out of the box
+* Add API to get the type_info of the InData and OutData of a Filter in AbstractFilter
 
 ### v0.1.4
 

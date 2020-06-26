@@ -2,41 +2,9 @@
 
 #include <memory>
 
+#include "AbstractFilter.h"
+
 namespace blpl {
-
-class AbstractFilter
-{
-public:
-    /**
-     * @brief When implemented, this method should reset the filter to it's
-     * original state, so that the next call of Filter::process behaves like
-     * this object was just created.
-     *
-     * @note Any implementer needs to call this as well.
-     */
-    virtual void reset()
-    {
-        resetCounter();
-    }
-
-    virtual ~AbstractFilter() = default;
-
-    /**
-     * @brief Returns the number of runs of the filter since the start of the
-     * pipeline or last reset.
-     */
-    uint32_t counter()
-    {
-        return m_counter;
-    }
-    void resetCounter()
-    {
-        m_counter = 0;
-    }
-
-protected:
-    uint32_t m_counter = 0;
-};
 
 /**
  * @brief This is the interface for all filters of the pipeline. It takes an
@@ -62,14 +30,26 @@ public:
 
     virtual OutData process(InData&& in)
     {
+        if (m_listener)
+            m_listener->preProcessCallback(in);
         auto out = processImpl(std::move(in));
-        ++m_counter;
+        if (m_listener)
+            m_listener->postProcessCallback(out);
 
         return out;
     }
 
     typedef InData inType;
     typedef OutData outType;
+
+    const std::type_info& getInDataTypeInfo() final
+    {
+        return typeid(InData);
+    }
+    const std::type_info& getOutDataTypeInfo() final
+    {
+        return typeid(OutData);
+    }
 };
 
 /// Convenience type for shared_ptr to filters

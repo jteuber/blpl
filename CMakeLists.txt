@@ -34,6 +34,8 @@ CPMAddPackage(
 FILE(GLOB_RECURSE headers CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/include/*.h")
 #FILE(GLOB_RECURSE sources CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/source/*.cpp")
 
+add_custom_target(headers SOURCES ${headers})
+
 # ---- Create library ----
 
 # Note: for header-only libraries change all PUBLIC flags to INTERFACE and create an interface target:

@@ -371,7 +371,8 @@ Pipeline<InData, OutData>::Pipeline(
         std::is_same<typename ExtendingFilter::outType, OutData>::value,
         "Filters are incompatible");
 
-    m_filters = std::move(pipeline.m_filters);
+    m_filterThreads = std::move(pipeline.m_filterThreads);
+    m_filters       = std::move(pipeline.m_filters);
 
     // prepare the pipe
     auto betweenPipe = std::move(pipeline.m_outPipe);
@@ -379,10 +380,12 @@ Pipeline<InData, OutData>::Pipeline(
     m_outPipe = std::make_shared<Pipe<OutData>>(false);
 
     // add the filter thread
-    m_filters.push_back(
+    m_filterThreads.push_back(
         std::make_shared<
             FilterThread<typename ExtendingFilter::inType, OutData>>(
             betweenPipe, extender, m_outPipe));
+
+    m_filters.push_back(extender);
 }
 
 /**
@@ -411,14 +414,17 @@ Pipeline<InData, OutData>::Pipeline(std::shared_ptr<Filter1> first,
     m_outPipe = std::make_shared<Pipe<typename Filter2::outType>>(false);
 
     // then create the filter threads
-    m_filters.push_back(
+    m_filterThreads.push_back(
         std::make_shared<
             FilterThread<typename Filter1::inType, typename Filter1::outType>>(
             m_inPipe, first, betweenPipe));
-    m_filters.push_back(
+    m_filterThreads.push_back(
         std::make_shared<
             FilterThread<typename Filter2::inType, typename Filter2::outType>>(
             betweenPipe, second, m_outPipe));
+
+    m_filters.push_back(first);
+    m_filters.push_back(second);
 }
 
 } // namespace blpl
