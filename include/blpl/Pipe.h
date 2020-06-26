@@ -57,6 +57,7 @@ void Pipe<TData>::push(TData&& data)
     if (!m_enabled)
         return;
 
+    m_valid = false;
     m_elem  = std::move(data);
     m_valid = true;
 }
