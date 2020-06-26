@@ -41,6 +41,15 @@ public:
 
     typedef InData inType;
     typedef OutData outType;
+
+    const std::type_info& getInDataTypeInfo() final
+    {
+        return typeid(InData);
+    }
+    const std::type_info& getOutDataTypeInfo() final
+    {
+        return typeid(OutData);
+    }
 };
 
 /// Convenience type for shared_ptr to filters

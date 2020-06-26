@@ -34,6 +34,9 @@ public:
 
     virtual ~AbstractFilter() = default;
 
+    virtual const std::type_info& getInDataTypeInfo()  = 0;
+    virtual const std::type_info& getOutDataTypeInfo() = 0;
+
     void setListener(const std::shared_ptr<AbstractFilterListener>& listener)
     {
         m_listener = listener;
