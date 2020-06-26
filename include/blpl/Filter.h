@@ -30,13 +30,11 @@ public:
 
     virtual OutData process(InData&& in)
     {
-        std::chrono::time_point start =
-            std::chrono::high_resolution_clock::now();
-
+        if (m_listener)
+            m_listener->preProcessCallback(in);
         auto out = processImpl(std::move(in));
-
-        m_wallTime += std::chrono::high_resolution_clock::now() - start;
-        ++m_counter;
+        if (m_listener)
+            m_listener->postProcessCallback(out);
 
         return out;
     }
