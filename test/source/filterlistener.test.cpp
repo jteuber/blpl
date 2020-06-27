@@ -8,6 +8,8 @@
 
 using namespace blpl;
 
+namespace {
+
 class PassthroughWithDelay : public Filter<int, int>
 {
 public:
@@ -70,3 +72,22 @@ TEST_CASE("intercepting")
     out = filter->process(3);
     REQUIRE(out == 3);
 }
+
+TEST_CASE("introspection")
+{
+    class TestFilter : public Filter<int, float>
+    {
+    public:
+        float processImpl(int&& in) override
+        {
+            return static_cast<float>(in);
+        }
+    };
+
+    auto filter = std::make_shared<TestFilter>();
+
+    REQUIRE(filter->getInDataTypeInfo() == typeid(int));
+    REQUIRE(filter->getOutDataTypeInfo() == typeid(float));
+}
+
+} // namespace
