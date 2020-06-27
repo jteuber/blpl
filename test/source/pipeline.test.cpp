@@ -116,7 +116,7 @@ TEST_CASE("pipeline test with generator")
     for (int i = 0; i < 101; ++i) {
         pipeline.outPipe()->blockingPop();
     }
-    std::this_thread::yield();
+    std::this_thread::sleep_for(std::chrono::milliseconds(20));
     pipeline.stop();
 
     CHECK(filter0->m_i == 100);

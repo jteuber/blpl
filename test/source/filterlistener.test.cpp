@@ -2,22 +2,25 @@
 #include <blpl/InterceptingFilterListener.h>
 #include <blpl/ProfilingFilterListener.h>
 
+#include <thread>
+
 #include <doctest/doctest.h>
 
 using namespace blpl;
 
-class Passthrough : public Filter<int, int>
+class PassthroughWithDelay : public Filter<int, int>
 {
 public:
     int processImpl(int&& in) override
     {
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
         return std::move(in);
     }
 };
 
 TEST_CASE("profiling")
 {
-    auto filter   = std::make_shared<Passthrough>();
+    auto filter   = std::make_shared<PassthroughWithDelay>();
     auto profiler = std::make_shared<ProfilingFilterListener>();
     filter->setListener(profiler);
 
@@ -44,9 +47,12 @@ TEST_CASE("profiling")
 
 TEST_CASE("intercepting")
 {
-    auto filter      = std::make_shared<Passthrough>();
+    auto filter      = std::make_shared<PassthroughWithDelay>();
     auto interceptor = std::make_shared<InterceptingFilterListener>();
     filter->setListener(interceptor);
+
+    interceptor->doOnLastOutData(
+        [](const std::any& lastOut) { REQUIRE_FALSE(lastOut.has_value()); });
 
     auto out = filter->process(1);
     REQUIRE(out == 1);
