@@ -10,7 +10,10 @@ namespace blpl {
 class ProfilingFilterListener : public AbstractFilterListener
 {
 public:
-    ProfilingFilterListener() {}
+    ProfilingFilterListener()
+    {
+        resetMetrics();
+    }
     virtual ~ProfilingFilterListener() = default;
 
     /**

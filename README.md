@@ -96,6 +96,11 @@ int main()
 
 ## Changelog
 
+### v0.1.6 (hotfix release)
+
+* Fix failing tests
+* Initialize members in ProfilingFilterListener
+
 ### v0.1.5
 
 * Fix test on Windows
