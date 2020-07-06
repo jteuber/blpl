@@ -46,7 +46,11 @@ TEST_CASE("simple multifilter construction")
     auto filter2     = std::make_shared<TestFilter2>();
     auto multifilter = filter1 & filter2;
 
-    REQUIRE(multifilter.size() == 2);
+    REQUIRE(multifilter.getInDataTypeInfo() == filter1->getInDataTypeInfo());
+    REQUIRE(multifilter.getOutDataTypeInfo() == filter1->getOutDataTypeInfo());
+    REQUIRE_FALSE(filter1->isMultiFilter());
+    REQUIRE(multifilter.isMultiFilter());
+    REQUIRE(multifilter.numParallel() == 2);
 }
 
 TEST_CASE("bigger multifilter construction")
@@ -57,7 +61,11 @@ TEST_CASE("bigger multifilter construction")
 
     auto multifilter = filter1 & filter2 & filter3;
 
-    REQUIRE(multifilter.size() == 3);
+    REQUIRE(multifilter.getInDataTypeInfo() == filter1->getInDataTypeInfo());
+    REQUIRE(multifilter.getOutDataTypeInfo() == filter1->getOutDataTypeInfo());
+    REQUIRE_FALSE(filter1->isMultiFilter());
+    REQUIRE(multifilter.isMultiFilter());
+    REQUIRE(multifilter.numParallel() == 3);
 }
 
 TEST_CASE("multifilter construction from vector")
@@ -69,7 +77,8 @@ TEST_CASE("multifilter construction from vector")
 
     auto multifilter = MultiFilter<int, float>(vector);
 
-    REQUIRE(multifilter.size() == 3);
+    REQUIRE(multifilter.isMultiFilter());
+    REQUIRE(multifilter.numParallel() == 3);
 }
 
 TEST_CASE("simple multifilter process")

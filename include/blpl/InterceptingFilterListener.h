@@ -22,7 +22,7 @@ public:
      */
     void doOnLastOutData(std::function<void(const std::any&)> doThis)
     {
-        std::unique_lock lock(m_lastDataMutex);
+        std::unique_lock<std::mutex> lock(m_lastDataMutex);
         doThis(m_lastDataCopy);
     }
 
@@ -45,7 +45,7 @@ public:
         m_doOnNextData(out);
         m_doOnNextData = [](const std::any&) {};
 
-        std::unique_lock lock(m_lastDataMutex);
+        std::unique_lock<std::mutex> lock(m_lastDataMutex);
         m_lastDataCopy = out;
     }
 

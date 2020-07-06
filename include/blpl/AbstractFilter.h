@@ -16,6 +16,8 @@ class AbstractFilterListener
 public:
     virtual void preProcessCallback(const std::any& in)   = 0;
     virtual void postProcessCallback(const std::any& out) = 0;
+
+    virtual ~AbstractFilterListener() = default;
 };
 
 /**
@@ -30,17 +32,38 @@ public:
      * original state, so that the next call of Filter::process behaves like
      * this object was just created.
      */
-    virtual void reset(){};
+    virtual void reset() {}
 
-    virtual ~AbstractFilter() = default;
-
-    virtual const std::type_info& getInDataTypeInfo()  = 0;
-    virtual const std::type_info& getOutDataTypeInfo() = 0;
-
+    /**
+     * @brief Set a listener for this filter.
+     */
     void setListener(const std::shared_ptr<AbstractFilterListener>& listener)
     {
         m_listener = listener;
     }
+
+    /**
+     * @brief Returns whether this is a MultiFilter aka has several parallel
+     * filters.
+     */
+    [[nodiscard]] virtual bool isMultiFilter() const = 0;
+    /**
+     * @brief Returns the number of parallel filters if this is a MultiFilter.
+     */
+    [[nodiscard]] virtual size_t numParallel() const = 0;
+
+    /**
+     * @brief Returns the type_info for the type that is passed into this
+     * filter.
+     */
+    virtual const std::type_info& getInDataTypeInfo() = 0;
+    /**
+     * @brief Returns the type_info for the type that is returned by the
+     * process() method of this filter.
+     */
+    virtual const std::type_info& getOutDataTypeInfo() = 0;
+
+    virtual ~AbstractFilter() = default;
 
 protected:
     std::shared_ptr<AbstractFilterListener> m_listener = nullptr;
