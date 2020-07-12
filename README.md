@@ -10,14 +10,13 @@
 Welcome to the big, lightweight pipeline: a modern C++ pipeline library for high concurrency, high through-put
 computation on the CPU.
 
-WARNING: The API of this library is still very unstable in the 0.1.x times. I might change a lot from one subversion to the next. Only what's used in *How to compile* is guaranteed to work in this minor version. (But it might change slightly in 0.2.)
+The blpl was developed to be a very easy to use and lightweight pipeline library that enables very high concurrency
+ on pipelines with a medium to high number of filters. It supports parallel filters that run in lock step (see MultiFilter)
+  and filters that split data to input into or join the output of a MultiFilter as simple std::vectors.
 
 The concurrency is happening on a per filter-instance level. This means that one specific filter in the pipeline is
- always running sequentially, making it possible for the filter to have state, while all filters run parallel to each
-  other, enabling very high concurrency on pipelines with a medium to high number of filters.
-
-This library was originally developed for a research project using computer vision and machine learning. The goal was
- to have a lightweight pipeline library that adds as little overhead as possible.
+ always running sequentially and never parallel. This enables the filter to have state, while all filters run parallel
+  to each other.
 
 ## How to compile
 
@@ -30,6 +29,8 @@ in the library directory.
 The library has for now only been tested on linux. It might still have some hickups on windows and mac, but should in theory (tm) work fine.
 
 ## How to use
+
+The following is a very simple example program.
 
 ```c++
 #include <blpl/Pipeline.h>
@@ -95,6 +96,12 @@ int main()
 
 
 ## Changelog
+
+### v0.2.0
+
+* Pipes now support callbacks on push
+* FilterThreads use these callbacks instead of busy waiting to start processing when waiting
+for the preceding filter
 
 ### v0.1.6 (hotfix release)
 
