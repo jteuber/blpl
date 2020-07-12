@@ -5,6 +5,8 @@
 
 using namespace blpl;
 
+namespace {
+
 class Passthrough : public Filter<int, int>
 {
 public:
@@ -87,3 +89,5 @@ TEST_CASE("metrics")
     REQUIRE(outPipe->blockingPop() == 3);
     REQUIRE(profiler->counter() == 1);
 }
+
+} // namespace

@@ -15,6 +15,13 @@ public:
     {
         return static_cast<float>(in) / 2.f;
     }
+
+    void reset() override
+    {
+        ++resetted;
+    }
+
+    int resetted = 0;
 };
 
 class TestFilter2 : public Filter<int, float>
@@ -24,6 +31,13 @@ public:
     {
         return static_cast<float>(in) * 2.f;
     }
+
+    void reset() override
+    {
+        ++resetted;
+    }
+
+    int resetted = 0;
 };
 
 TEST_CASE("simple multifilter construction")
@@ -32,7 +46,11 @@ TEST_CASE("simple multifilter construction")
     auto filter2     = std::make_shared<TestFilter2>();
     auto multifilter = filter1 & filter2;
 
-    REQUIRE(multifilter.size() == 2);
+    REQUIRE(multifilter.getInDataTypeInfo() == filter1->getInDataTypeInfo());
+    REQUIRE(multifilter.getOutDataTypeInfo() == filter1->getOutDataTypeInfo());
+    REQUIRE_FALSE(filter1->isMultiFilter());
+    REQUIRE(multifilter.isMultiFilter());
+    REQUIRE(multifilter.numParallel() == 2);
 }
 
 TEST_CASE("bigger multifilter construction")
@@ -43,7 +61,11 @@ TEST_CASE("bigger multifilter construction")
 
     auto multifilter = filter1 & filter2 & filter3;
 
-    REQUIRE(multifilter.size() == 3);
+    REQUIRE(multifilter.getInDataTypeInfo() == filter1->getInDataTypeInfo());
+    REQUIRE(multifilter.getOutDataTypeInfo() == filter1->getOutDataTypeInfo());
+    REQUIRE_FALSE(filter1->isMultiFilter());
+    REQUIRE(multifilter.isMultiFilter());
+    REQUIRE(multifilter.numParallel() == 3);
 }
 
 TEST_CASE("multifilter construction from vector")
@@ -55,7 +77,8 @@ TEST_CASE("multifilter construction from vector")
 
     auto multifilter = MultiFilter<int, float>(vector);
 
-    REQUIRE(multifilter.size() == 3);
+    REQUIRE(multifilter.isMultiFilter());
+    REQUIRE(multifilter.numParallel() == 3);
 }
 
 TEST_CASE("simple multifilter process")
@@ -68,6 +91,26 @@ TEST_CASE("simple multifilter process")
     std::vector<float> out = multifilter.process(std::move(in));
 
     REQUIRE(out[0] * out[1] == 4);
+}
+
+TEST_CASE("reset")
+{
+    auto filter1     = std::make_shared<TestFilter1>();
+    auto filter2     = std::make_shared<TestFilter2>();
+    auto multifilter = filter1 & filter2;
+
+    REQUIRE(filter1->resetted == 0);
+    REQUIRE(filter2->resetted == 0);
+
+    multifilter.reset();
+
+    REQUIRE(filter1->resetted == 1);
+    REQUIRE(filter2->resetted == 1);
+
+    multifilter.reset();
+
+    REQUIRE(filter1->resetted == 2);
+    REQUIRE(filter2->resetted == 2);
 }
 
 } // namespace

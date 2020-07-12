@@ -39,14 +39,23 @@ public:
         return out;
     }
 
+    [[nodiscard]] bool isMultiFilter() const override
+    {
+        return false;
+    }
+    [[nodiscard]] size_t numParallel() const override
+    {
+        return 1;
+    }
+
     typedef InData inType;
     typedef OutData outType;
 
-    const std::type_info& getInDataTypeInfo() final
+    const std::type_info& getInDataTypeInfo() override
     {
         return typeid(InData);
     }
-    const std::type_info& getOutDataTypeInfo() final
+    const std::type_info& getOutDataTypeInfo() override
     {
         return typeid(OutData);
     }

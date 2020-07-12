@@ -35,8 +35,9 @@ Pipe<TData>::Pipe(bool waitForSlowestFilter)
 template <typename TData>
 TData Pipe<TData>::pop()
 {
-    m_valid = false;
-    return std::move(m_elem);
+    TData temp = std::move(m_elem);
+    m_valid    = false;
+    return temp;
 }
 
 template <typename TData>
@@ -60,6 +61,7 @@ void Pipe<TData>::push(TData&& data)
     m_valid = false;
     m_elem  = std::move(data);
     m_valid = true;
+    m_pushCallback();
 }
 
 /// GENERATOR PIPES
@@ -80,6 +82,11 @@ public:
     {
         return pop();
     }
+
+    unsigned int size() const override
+    {
+        return 1;
+    }
 };
 template <>
 class Pipe<std::vector<Generator>> : public AbstractPipe
@@ -97,6 +104,11 @@ public:
     std::vector<Generator> blockingPop()
     {
         return pop();
+    }
+
+    unsigned int size() const override
+    {
+        return 1;
     }
 };
 

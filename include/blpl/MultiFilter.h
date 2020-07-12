@@ -29,12 +29,28 @@ public:
     MultiFilter<InData, OutData>&
     operator&(std::shared_ptr<ExtendingFilter> filter);
 
-    [[nodiscard]] size_t size() const;
+    [[nodiscard]] bool isMultiFilter() const override
+    {
+        return true;
+    }
+    [[nodiscard]] size_t numParallel() const override
+    {
+        return m_filters.size();
+    }
 
     void reset() override
     {
         for (auto& filter : m_filters)
             filter->reset();
+    }
+
+    const std::type_info& getInDataTypeInfo() override
+    {
+        return typeid(InData);
+    }
+    const std::type_info& getOutDataTypeInfo() override
+    {
+        return typeid(OutData);
     }
 
 protected:
@@ -95,12 +111,6 @@ operator&(std::shared_ptr<Filter1> first, std::shared_ptr<Filter2> second)
 {
     return MultiFilter<typename Filter1::inType, typename Filter1::outType>(
         first, second);
-}
-
-template <class InData, class OutData>
-size_t MultiFilter<InData, OutData>::size() const
-{
-    return m_filters.size();
 }
 
 template <class InData, class OutData>

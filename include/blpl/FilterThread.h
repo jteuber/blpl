@@ -1,5 +1,6 @@
 #pragma once
 
+#include <atomic>
 #include <memory>
 #include <mutex>
 
@@ -43,9 +44,10 @@ private:
     std::shared_ptr<Filter<InData, OutData>> m_filter;
     std::shared_ptr<Pipe<OutData>> m_outPipe;
 
-    volatile bool m_bFilterThreadActive;
+    std::atomic<bool> m_bFilterThreadActive;
     volatile bool m_bFiltering;
     std::thread m_thread;
+    std::mutex m_mutex;
 };
 
 /**
@@ -68,7 +70,9 @@ FilterThread<InData, OutData>::FilterThread(
     , m_outPipe(outPipe)
     , m_bFilterThreadActive(false)
     , m_bFiltering(false)
-{}
+{
+    m_inPipe->registerPushCallback([this] { start(); });
+}
 
 /**
  * @brief Destructor, stops the thread.
@@ -76,8 +80,7 @@ FilterThread<InData, OutData>::FilterThread(
 template <class InData, class OutData>
 FilterThread<InData, OutData>::~FilterThread()
 {
-    if (m_bFiltering)
-        FilterThread<InData, OutData>::stop();
+    stop();
 }
 
 /**
@@ -98,10 +101,18 @@ bool FilterThread<InData, OutData>::isFiltering()
 template <class InData, class OutData>
 void FilterThread<InData, OutData>::start()
 {
+    std::scoped_lock<std::mutex> lock(m_mutex);
     m_inPipe->enable();
     m_outPipe->enable();
+    m_bFiltering = true;
 
-    m_thread = std::thread(&FilterThread<InData, OutData>::run, this);
+    if (!m_bFilterThreadActive) {
+        if (m_thread.joinable())
+            m_thread.join();
+        m_bFilterThreadActive = true;
+
+        m_thread = std::thread(&FilterThread<InData, OutData>::run, this);
+    }
 }
 
 /**
@@ -110,13 +121,15 @@ void FilterThread<InData, OutData>::start()
 template <class InData, class OutData>
 void FilterThread<InData, OutData>::stop()
 {
-    if (m_bFiltering) {
-        m_bFilterThreadActive = false;
-        m_inPipe->reset();
-        m_inPipe->disable();
+    std::scoped_lock<std::mutex> lock(m_mutex);
+    m_inPipe->reset();
+    m_inPipe->disable();
 
+    m_bFiltering          = false;
+    m_bFilterThreadActive = false;
+
+    if (m_thread.joinable())
         m_thread.join();
-    }
 }
 
 /**
@@ -143,14 +156,13 @@ void FilterThread<InData, OutData>::reset()
 template <class InData, class OutData>
 void FilterThread<InData, OutData>::run()
 {
-    m_bFilterThreadActive = true;
-    m_bFiltering          = true;
     do {
-        InData temp = m_inPipe->blockingPop();
-        if (m_bFilterThreadActive)
-            m_outPipe->push(m_filter->process(std::move(temp)));
+        if (m_inPipe->size() < 1) {
+            m_bFilterThreadActive = false;
+        } else {
+            m_outPipe->push(m_filter->process(m_inPipe->pop()));
+        }
     } while (m_bFilterThreadActive);
-    m_bFiltering = false;
 }
 
 } // namespace blpl

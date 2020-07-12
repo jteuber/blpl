@@ -124,3 +124,18 @@ TEST_CASE("blocking push")
     REQUIRE(pipe.pop() == 2);
     REQUIRE(pipe.size() == 0);
 }
+
+TEST_CASE("push callback")
+{
+    Pipe<int> pipe;
+    int i = 0;
+    pipe.registerPushCallback([&i] { ++i; });
+
+    REQUIRE(i == 0);
+
+    pipe.push(1);
+    REQUIRE(i == 1);
+
+    pipe.push(1);
+    REQUIRE(i == 2);
+}
