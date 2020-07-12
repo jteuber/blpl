@@ -1,6 +1,7 @@
 #pragma once
 
 #include <atomic>
+#include <functional>
 
 namespace blpl {
 
@@ -30,15 +31,22 @@ public:
         m_waitForSlowestFilter = newValue;
     }
 
-    unsigned int size() const
+    virtual unsigned int size() const
     {
         return m_valid ? 1 : 0;
+    }
+
+    void registerPushCallback(std::function<void()> pushCallback)
+    {
+        m_pushCallback = pushCallback;
     }
 
 protected:
     std::atomic<bool> m_valid;
     bool m_waitForSlowestFilter;
     bool m_enabled;
+
+    std::function<void()> m_pushCallback = [] {};
 };
 
 } // namespace blpl
