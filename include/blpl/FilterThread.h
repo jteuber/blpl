@@ -157,10 +157,14 @@ template <class InData, class OutData>
 void FilterThread<InData, OutData>::run()
 {
     do {
-        if (m_inPipe->size() < 1) {
-            m_bFilterThreadActive = false;
-        } else {
-            m_outPipe->push(m_filter->process(m_inPipe->pop()));
+        std::unique_lock<std::mutex> lock(m_mutex, std::defer_lock);
+        if (lock.try_lock()) {
+            if (m_inPipe->size() < 1) {
+                m_bFilterThreadActive = false;
+            } else {
+                lock.unlock();
+                m_outPipe->push(m_filter->process(m_inPipe->pop()));
+            }
         }
     } while (m_bFilterThreadActive);
 }
