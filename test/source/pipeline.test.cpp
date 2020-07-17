@@ -22,7 +22,6 @@ public:
 
     void reset() override
     {
-        Filter<Generator, int>::reset();
         m_i              = 0;
         m_resetWasCalled = true;
     }

@@ -36,7 +36,7 @@ public:
     {
         return m_theGenerator;
     }
-    size_t size() const
+    size_t size() const noexcept
     {
         return std::numeric_limits<size_t>::max();
     }

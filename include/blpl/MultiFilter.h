@@ -29,26 +29,26 @@ public:
     MultiFilter<InData, OutData>&
     operator&(std::shared_ptr<ExtendingFilter> filter);
 
-    [[nodiscard]] bool isMultiFilter() const override
+    [[nodiscard]] bool isMultiFilter() const noexcept override
     {
         return true;
     }
-    [[nodiscard]] size_t numParallel() const override
+    [[nodiscard]] size_t numParallel() const noexcept override
     {
         return m_filters.size();
     }
 
-    void reset() override
+    void reset() noexcept override
     {
         for (auto& filter : m_filters)
             filter->reset();
     }
 
-    const std::type_info& getInDataTypeInfo() override
+    const std::type_info& getInDataTypeInfo() const noexcept override
     {
         return typeid(InData);
     }
-    const std::type_info& getOutDataTypeInfo() override
+    const std::type_info& getOutDataTypeInfo() const noexcept override
     {
         return typeid(OutData);
     }

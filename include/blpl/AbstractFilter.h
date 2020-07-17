@@ -37,7 +37,8 @@ public:
     /**
      * @brief Set a listener for this filter.
      */
-    void setListener(const std::shared_ptr<AbstractFilterListener>& listener)
+    void setListener(
+        const std::shared_ptr<AbstractFilterListener>& listener) noexcept
     {
         m_listener = listener;
     }
@@ -56,12 +57,12 @@ public:
      * @brief Returns the type_info for the type that is passed into this
      * filter.
      */
-    virtual const std::type_info& getInDataTypeInfo() = 0;
+    [[nodiscard]] virtual const std::type_info& getInDataTypeInfo() const = 0;
     /**
      * @brief Returns the type_info for the type that is returned by the
      * process() method of this filter.
      */
-    virtual const std::type_info& getOutDataTypeInfo() = 0;
+    [[nodiscard]] virtual const std::type_info& getOutDataTypeInfo() const = 0;
 
     virtual ~AbstractFilter() = default;
 
