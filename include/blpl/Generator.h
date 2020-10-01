@@ -26,28 +26,3 @@ public:
 };
 
 } // namespace blpl
-
-namespace std {
-
-template <>
-class vector<blpl::Generator>
-{
-public:
-    blpl::Generator& operator[](size_t)
-    {
-        return m_theGenerator;
-    }
-    const blpl::Generator& operator[](size_t) const
-    {
-        return m_theGenerator;
-    }
-    size_t size() const noexcept
-    {
-        return std::numeric_limits<size_t>::max();
-    }
-
-private:
-    blpl::Generator m_theGenerator;
-};
-
-} // namespace std

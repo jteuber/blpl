@@ -5,6 +5,7 @@
 #include <vector>
 
 #include "Filter.h"
+#include "Generator.h"
 
 namespace blpl {
 
@@ -123,22 +124,35 @@ MultiFilter<InData, OutData>::processImpl(std::vector<InData>&& in)
     assert(!m_filters.empty());
     std::vector<OutData> out(m_filters.size());
 
-    if (in.size() >= m_filters.size()) {
+    std::vector<std::thread> threads;
+
+    if constexpr (std::is_same<InData, Generator>()) {
         // call process of all sub-filters in their own thread
-        std::vector<std::thread> threads;
         for (size_t i = 1; i < m_filters.size(); ++i)
-            threads.emplace_back([&out    = out[i],
-                                  &filter = m_filters[i],
-                                  in      = std::move(in[i])]() mutable {
-                out = filter->process(std::move(in));
-            });
+            threads.emplace_back(
+                [&out = out[i], &filter = m_filters[i]]() mutable {
+                    out = filter->process(std::move(Generator()));
+                });
 
         // but execute the first filter in this thread
-        out[0] = m_filters[0]->process(std::move(in[0]));
+        out[0] = m_filters[0]->process(std::move(Generator()));
+    } else {
+        if (in.size() >= m_filters.size()) {
+            // call process of all sub-filters in their own thread
+            for (size_t i = 1; i < m_filters.size(); ++i)
+                threads.emplace_back([&out    = out[i],
+                                      &filter = m_filters[i],
+                                      in      = std::move(in[i])]() mutable {
+                    out = filter->process(std::move(in));
+                });
 
-        for (auto& thread : threads)
-            thread.join();
+            // but execute the first filter in this thread
+            out[0] = m_filters[0]->process(std::move(in[0]));
+        }
     }
+
+    for (auto& thread : threads)
+        thread.join();
 
     return out;
 }
