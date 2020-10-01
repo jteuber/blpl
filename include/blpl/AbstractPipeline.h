@@ -38,12 +38,12 @@ public:
         }
     }
 
-    [[nodiscard]] size_t length() const
+    [[nodiscard]] size_t length() const noexcept
     {
         return m_filters.size();
     }
 
-    const std::list<std::shared_ptr<AbstractFilter>> filters() const
+    const std::list<std::shared_ptr<AbstractFilter>>& filters() const noexcept
     {
         return m_filters;
     }

@@ -14,29 +14,29 @@ public:
         , m_enabled(true)
     {}
 
-    void reset()
+    void reset() noexcept
     {
         m_valid = false;
     }
-    void disable()
+    void disable() noexcept
     {
         m_enabled = false;
     }
-    void enable()
+    void enable() noexcept
     {
         m_enabled = true;
     }
-    void setWaitForSlowestFilter(bool newValue)
+    void setWaitForSlowestFilter(bool newValue) noexcept
     {
         m_waitForSlowestFilter = newValue;
     }
 
-    virtual unsigned int size() const
+    virtual unsigned int size() const noexcept
     {
         return m_valid ? 1 : 0;
     }
 
-    void registerPushCallback(std::function<void()> pushCallback)
+    void registerPushCallback(std::function<void()> pushCallback) noexcept
     {
         m_pushCallback = pushCallback;
     }

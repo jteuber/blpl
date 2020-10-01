@@ -22,7 +22,6 @@ public:
 
     void reset() override
     {
-        Filter<Generator, int>::reset();
         m_i              = 0;
         m_resetWasCalled = true;
     }
@@ -112,11 +111,13 @@ TEST_CASE("pipeline test with generator")
 
     REQUIRE(pipeline.length() == 4);
 
+    // we want to spin the pipeline ourselfs
+    pipeline.outPipe()->setWaitForSlowestFilter(true);
+
     pipeline.start();
     for (int i = 0; i < 101; ++i) {
         pipeline.outPipe()->blockingPop();
     }
-    std::this_thread::sleep_for(std::chrono::milliseconds(20));
     pipeline.stop();
 
     CHECK(filter0->m_i == 100);
@@ -129,6 +130,9 @@ TEST_CASE("pipeline with rvalue filters")
     auto pipeline = TestFilter1() | TestFilter2() | TestFilter3();
 
     REQUIRE(pipeline.length() == 3);
+
+    // we want to spin the pipeline ourselfs
+    pipeline.outPipe()->setWaitForSlowestFilter(true);
 
     pipeline.start();
     std::string lastOut;

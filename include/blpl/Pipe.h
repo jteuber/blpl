@@ -18,10 +18,10 @@ public:
     explicit Pipe(bool waitForSlowestFilter = false);
     virtual ~Pipe() = default;
 
-    TData pop();
-    TData blockingPop();
+    TData pop() noexcept;
+    TData blockingPop() noexcept;
 
-    void push(TData&& data);
+    void push(TData&& data) noexcept;
 
 private:
     TData m_elem;
@@ -33,7 +33,7 @@ Pipe<TData>::Pipe(bool waitForSlowestFilter)
 {}
 
 template <typename TData>
-TData Pipe<TData>::pop()
+TData Pipe<TData>::pop() noexcept
 {
     TData temp = std::move(m_elem);
     m_valid    = false;
@@ -41,7 +41,7 @@ TData Pipe<TData>::pop()
 }
 
 template <typename TData>
-TData Pipe<TData>::blockingPop()
+TData Pipe<TData>::blockingPop() noexcept
 {
     while (!m_valid && m_enabled)
         std::this_thread::yield();
@@ -50,7 +50,7 @@ TData Pipe<TData>::blockingPop()
 }
 
 template <typename TData>
-void Pipe<TData>::push(TData&& data)
+void Pipe<TData>::push(TData&& data) noexcept
 {
     while (m_waitForSlowestFilter && m_valid && m_enabled)
         std::this_thread::yield();
@@ -74,16 +74,16 @@ public:
     {}
     virtual ~Pipe() = default;
 
-    Generator pop()
+    Generator pop() noexcept
     {
         return Generator();
     }
-    Generator blockingPop()
+    Generator blockingPop() noexcept
     {
         return pop();
     }
 
-    unsigned int size() const override
+    unsigned int size() const noexcept override
     {
         return 1;
     }
@@ -97,16 +97,16 @@ public:
     {}
     virtual ~Pipe() = default;
 
-    std::vector<Generator> pop()
+    std::vector<Generator> pop() noexcept
     {
         return std::vector<Generator>();
     }
-    std::vector<Generator> blockingPop()
+    std::vector<Generator> blockingPop() noexcept
     {
         return pop();
     }
 
-    unsigned int size() const override
+    unsigned int size() const noexcept override
     {
         return 1;
     }

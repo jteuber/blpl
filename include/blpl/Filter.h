@@ -39,11 +39,11 @@ public:
         return out;
     }
 
-    [[nodiscard]] bool isMultiFilter() const override
+    [[nodiscard]] bool isMultiFilter() const noexcept override
     {
         return false;
     }
-    [[nodiscard]] size_t numParallel() const override
+    [[nodiscard]] size_t numParallel() const noexcept override
     {
         return 1;
     }
@@ -51,11 +51,11 @@ public:
     typedef InData inType;
     typedef OutData outType;
 
-    const std::type_info& getInDataTypeInfo() override
+    const std::type_info& getInDataTypeInfo() const noexcept override
     {
         return typeid(InData);
     }
-    const std::type_info& getOutDataTypeInfo() override
+    const std::type_info& getOutDataTypeInfo() const noexcept override
     {
         return typeid(OutData);
     }

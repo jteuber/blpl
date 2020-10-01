@@ -30,11 +30,11 @@ public:
 
     ~FilterThread();
 
-    virtual bool isFiltering();
+    virtual bool isFiltering() const noexcept;
 
-    void start() override;
-    void stop() override;
-    void reset() override;
+    void start() noexcept override;
+    void stop() noexcept override;
+    void reset() noexcept override;
 
 private:
     void run();
@@ -90,7 +90,7 @@ FilterThread<InData, OutData>::~FilterThread()
  * not.
  */
 template <class InData, class OutData>
-bool FilterThread<InData, OutData>::isFiltering()
+bool FilterThread<InData, OutData>::isFiltering() const noexcept
 {
     return m_bFiltering;
 }
@@ -99,7 +99,7 @@ bool FilterThread<InData, OutData>::isFiltering()
  * @brief Starts the filter.
  */
 template <class InData, class OutData>
-void FilterThread<InData, OutData>::start()
+void FilterThread<InData, OutData>::start() noexcept
 {
     std::scoped_lock<std::mutex> lock(m_mutex);
     m_inPipe->enable();
@@ -119,11 +119,12 @@ void FilterThread<InData, OutData>::start()
  * @brief Stops the thread and joins it with the calling one.
  */
 template <class InData, class OutData>
-void FilterThread<InData, OutData>::stop()
+void FilterThread<InData, OutData>::stop() noexcept
 {
     std::scoped_lock<std::mutex> lock(m_mutex);
     m_inPipe->reset();
     m_inPipe->disable();
+    m_outPipe->disable();
 
     m_bFiltering          = false;
     m_bFilterThreadActive = false;
@@ -137,7 +138,7 @@ void FilterThread<InData, OutData>::stop()
  * up.
  */
 template <class InData, class OutData>
-void FilterThread<InData, OutData>::reset()
+void FilterThread<InData, OutData>::reset() noexcept
 {
     bool stopAndRestart = m_bFiltering;
     if (stopAndRestart) {
@@ -157,10 +158,14 @@ template <class InData, class OutData>
 void FilterThread<InData, OutData>::run()
 {
     do {
-        if (m_inPipe->size() < 1) {
-            m_bFilterThreadActive = false;
-        } else {
-            m_outPipe->push(m_filter->process(m_inPipe->pop()));
+        std::unique_lock<std::mutex> lock(m_mutex, std::defer_lock);
+        if (lock.try_lock()) {
+            if (m_inPipe->size() < 1) {
+                m_bFilterThreadActive = false;
+            } else {
+                lock.unlock();
+                m_outPipe->push(m_filter->process(m_inPipe->pop()));
+            }
         }
     } while (m_bFilterThreadActive);
 }
