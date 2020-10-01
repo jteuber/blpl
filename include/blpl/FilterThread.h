@@ -124,6 +124,7 @@ void FilterThread<InData, OutData>::stop() noexcept
     std::scoped_lock<std::mutex> lock(m_mutex);
     m_inPipe->reset();
     m_inPipe->disable();
+    m_outPipe->disable();
 
     m_bFiltering          = false;
     m_bFilterThreadActive = false;
