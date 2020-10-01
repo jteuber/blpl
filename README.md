@@ -97,6 +97,11 @@ int main()
 
 ## Changelog
 
+### v0.2.1
+
+* Fix a possible race condition
+* More documentation, method specifiers and code cleanup
+
 ### v0.2.0
 
 * Pipes now support callbacks on push
