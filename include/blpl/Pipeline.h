@@ -8,7 +8,20 @@
 namespace blpl {
 
 /**
- * Main pipeline class.
+ * @brief Main pipeline template.
+ *
+ * Use the | and > operators to create a pipeline by stringing together two or
+ * more filters. The operator| creates a blocking pipe between the filters,
+ * meaning that no data will be discarded in the pipes and filters made to
+ * wait. Therefore the speed of the pipeline is capped by the slowest filter.
+ * Operator> on the other hands creates a discarding pipe, meaning that the pipe
+ * will throw away any data it is still holding if the filter in front of it
+ * pushes data on it while the one behind it hasn't received the old one yet
+ * because it's still processing. The last pipe by default is always a
+ * discarding pipe. So if you want to use the outgoing data in some way or (with
+ * blocking pipes) "spin" the pipeline yourself, make sure to call
+ * outPipe()->setWaitForSlowestFilter(true).
+ *
  * @tparam InData The datatype that is consumed by the pipeline.
  * @tparam OutData The datatype that is produced by the pipeline.
  *

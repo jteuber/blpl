@@ -9,9 +9,12 @@
 namespace blpl {
 
 /**
- * @brief This is the interface for all filters of the pipeline. It takes an
- * input, processes it and produces an output to be processed by the next
- * filter.
+ * @brief This is a specific filter that takes a number of filters and executes
+ * them in lockstep on the input data which has to be supplied in a vector of at
+ * least the number of filters.
+ *
+ * @note A multifilter should be constructed by stringing together filters with
+ * the &-operator.
  */
 template <class InData, class OutData>
 class MultiFilter : public Filter<std::vector<InData>, std::vector<OutData>>
